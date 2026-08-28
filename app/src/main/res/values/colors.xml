@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    <!-- Primary -->
+    <color name="primary">#4F46F8</color>
+    <color name="primaryDark">#2E33D8</color>
+    <color name="primaryLight">#7367FF</color>
+
+    <!-- Background -->
+    <color name="background">#F7F8FC</color>
+
+    <!-- Text -->
+    <color name="textPrimary">#1A1C3A</color>
+    <color name="textSecondary">#757A98</color>
+
+    <!-- Divider -->
+    <color name="divider">#E8EAF5</color>
+
+    <!-- Search -->
+    <color name="hint">#9CA2C2</color>
+
+    <!-- Green -->
+    <color name="green">#16A34A</color>
+    <color name="greenLight">#E8F8EC</color>
+    <color name="greenL">#E7F9F2</color>
+
+    <!-- Red -->
+    <color name="red">#FF3B3B</color>
+    <color name="redLight">#FFEAEA</color>
+
+    <!-- Blue -->
+    <color name="blue">#2962FF</color>
+    <color name="blueLight">#EAF1FF</color>
+
+    <!-- Purple -->
+    <color name="purple">#5B3DF5</color>
+    <color name="purpleLight">#F1ECFF</color>
+
+    <!-- Orange -->
+    <color name="orange">#FFA726</color>
+
+    <!-- Shadow -->
+    <color name="shadow">#18000000</color>
+
+</resources>
