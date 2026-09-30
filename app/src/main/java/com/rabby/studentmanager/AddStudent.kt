@@ -7,7 +7,6 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import androidx.lifecycle.ViewModel
 import com.rabby.studentmanager.databinding.ActivityAddStudentBinding
 
 class AddStudent : AppCompatActivity() {
@@ -47,8 +46,8 @@ class AddStudent : AppCompatActivity() {
                 return@setOnClickListener
             }
 
-            if ((marks > 100) || (marks < 0)){
-                binding.addMarksLayout.error = "Please enter a valid score between 1 and 100"
+            if (marks !in 0..100){
+                binding.addMarksLayout.error = "Please enter a valid score between 0 and 100"
                 return@setOnClickListener
             }
 

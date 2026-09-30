@@ -1,51 +1,63 @@
 package com.rabby.studentmanager
 
+
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+
 object StudentRepository {
 
-   val students = mutableListOf<Student>()
+    private val _students = MutableStateFlow<List<Student>>(emptyList())
 
-    var studentId = 1
+    val students : StateFlow<List<Student>> = _students.asStateFlow()
+
+
+    private var studentId = 1
 
     fun add(name: String,marks: Int){
-        students.add(
-            Student(
-                name = name,
-                marks = marks,
-                id = studentId++
-            )
+
+        val newStudent = Student(
+            id = studentId++,
+            name = name,
+            marks = marks
         )
 
+        _students.value = _students.value + newStudent
+
     }
 
-    fun all () : List<Student>{
-        return students.toList()
-    }
 
     fun getStudentById(id: Int) : Student? {
-       return students.find { it.id == id }
+       return _students.value.find { it.id == id }
+
     }
+
+
 
     fun updateStudent(id: Int,name: String,marks: Int){
 
-        val index = students.indexOfFirst {
-            it.id == id
+        _students.value = _students.value.map { student ->
+
+            if (student.id == id){
+                Student(
+                    id = id,
+                    name = name,
+                    marks = marks
+                )
+
+            } else {
+                student
+            }
+
         }
 
-        if (index != -1){
-            students[index] = Student(
-                id = id,
-                name = name,
-                marks = marks
-            )
         }
 
-    }
 
     fun deleteStudent( id: Int){
-        students.removeIf {
-            it.id == id
+        _students.value = _students.value.filter {
+            it.id != id
         }
-
 
     }
 

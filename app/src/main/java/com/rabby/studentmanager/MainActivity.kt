@@ -10,14 +10,29 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.widget.addTextChangedListener
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.rabby.studentmanager.databinding.ActivityMainBinding
+import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
 
     private val viewModel : StudentViewModel by viewModels()
+
+    private val studentAdapter = StudentAdapter(
+        mutableListOf(),
+        onDeleteClick = {student ->
+            viewModel.deleteStudent(student.id)
+        },
+        onEditClick = {student ->
+            openEditScreen(student)
+
+        }
+    )
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,23 +48,37 @@ class MainActivity : AppCompatActivity() {
         }
 
         binding.rvStudent.layoutManager = LinearLayoutManager(this)
-        refreshUI()
+        binding.rvStudent.adapter = studentAdapter
+
+        observeFilteredStudents()
         setUpButtons()
 
-        binding.etSearch.addTextChangedListener {
-            searchStudent()
+
+        binding.etSearch.addTextChangedListener { name ->
+            viewModel.searchStudent(name.toString().trim())
+        }
+
+
+    }
+
+    private fun  observeFilteredStudents(){
+
+        lifecycleScope.launch {
+
+            repeatOnLifecycle(Lifecycle.State.STARTED){
+
+                viewModel.filteredStudents.collect {
+                    studentAdapter.updateList(it)
+                    updateStatistics()
+                }
+            }
+
+
         }
 
     }
 
-    fun refreshUI(){
-
-        adapterView(viewModel.allStudents())
-        updateStatistics()
-    }
-
-
-    fun openEditScreen(student : Student) {
+    private fun openEditScreen(student : Student) {
 
         val intent = Intent(this, Edit::class.java)
 
@@ -62,96 +91,41 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-    fun setUpButtons(){
+    private fun setUpButtons(){
 
         binding.btnAll.setOnClickListener {
-            refreshUI()
+         viewModel.filterStudents("ALL")
         }
 
         binding.btnPassed.setOnClickListener {
 
-            val passList = viewModel.allStudents().filter {
-                it.marks >= 40
-            }
-
-           adapterView(passList)
+          viewModel.filterStudents("PASSED")
         }
 
         binding.btnFailed.setOnClickListener {
 
-            val failList = viewModel.allStudents().filter {
-                it.marks < 40
-            }
-
-           adapterView(failList)
-
+            viewModel.filterStudents("FAILED")
         }
 
         binding.btnAdd.setOnClickListener {
 
             startActivity(Intent(this, AddStudent :: class.java))
         }
-    }
 
-
-    fun updateStatistics(){
-
-        val list = viewModel.allStudents()
-
-        val topper = list.maxByOrNull { it.marks }
-        binding.topperName.text =
-            topper?.let { "${it.name}" } ?: "N/A"
-
-        binding.topperMarks.text =
-            topper?.let { "${it.marks} Marks" } ?: "00"
-
-        val avg =  if (list.isNotEmpty())
-            list.map { it.marks }.average()
-
-        else 0.0
-
-        binding.averageMarks.text =
-            "%.2f".format(avg)
-
-        binding.totalStudents.text =
-            "${list.size}"
-
-    }
-
-    fun searchStudent(){
-
-        val input = binding.etSearch.text.toString().trim()
-
-        val filterListed = viewModel.allStudents().filter {
-            it.name.contains(input,ignoreCase = true)
-        }
-
-        adapterView(filterListed)
 
     }
 
 
+    private fun updateStatistics(){
 
-    fun adapterView(list : List<Student>) {
+        val stats = viewModel.calculateStatistics()
 
-
-        binding.rvStudent.adapter = StudentAdapter(
-
-            list,
-
-            onDeleteClick = { student ->
-                viewModel.deleteStudent(student.id)
-                refreshUI()
-            },
-
-            onEditClick = { student ->
-                openEditScreen(student)
-            }
-        )
+        binding.topperName.text = "${stats.topperName}"
+        binding.topperMarks.text = "${stats.topperMarks}"
+        binding.averageMarks.text = "%.2f".format(stats.averageMarks)
+        binding.totalStudents.text ="${stats.totalStudents}"
 
     }
-
-
 
     override fun onResume() {
         super.onResume()
@@ -162,7 +136,7 @@ class MainActivity : AppCompatActivity() {
 
         imm.hideSoftInputFromWindow(binding.etSearch.windowToken,0)
 
-        refreshUI()
+
 
     }
 

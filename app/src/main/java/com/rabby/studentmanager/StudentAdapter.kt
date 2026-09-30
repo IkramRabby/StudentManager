@@ -1,6 +1,6 @@
 package com.rabby.studentmanager
 
-import android.content.Context
+
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
@@ -8,10 +8,16 @@ import androidx.recyclerview.widget.RecyclerView
 import com.rabby.studentmanager.databinding.ItemStudentBinding
 
 class StudentAdapter(
-    private val list: List<Student>,
+    private val list: MutableList<Student>,
     private val onDeleteClick : (Student) -> Unit,
     private val onEditClick : (Student) -> Unit
 ) : RecyclerView.Adapter<StudentAdapter.ViewHolder>() {
+
+    fun updateList(newList : List<Student>){
+        list.clear()
+        list.addAll(newList)
+        notifyDataSetChanged()
+    }
 
     inner class ViewHolder(
         val binding: ItemStudentBinding

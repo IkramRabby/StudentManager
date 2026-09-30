@@ -61,8 +61,8 @@ class Edit : AppCompatActivity() {
                 return@setOnClickListener
             }
 
-            if (marks > 100){
-                binding.addMarksLayout.error = "Keeps the marks within 100"
+            if (marks !in 0..100){
+                binding.addMarksLayout.error = "Please enter a valid score between 0 and 100"
                 return@setOnClickListener
             }
 
